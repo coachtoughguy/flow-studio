@@ -1,6 +1,6 @@
 # Flow Studio
 
-Turn Mermaid flowchart code into an editable Excalidraw drawing. Preview the structure, create a canvas draft, move and style individual shapes, then download JPEG or SVG output. Keep the source and edited drafts together in a project backup.
+Start with Mermaid flowchart code or draw directly on a blank Excalidraw canvas. Move and style individual shapes, then download JPEG or SVG output. Keep the source and edited drafts together in a project backup.
 
 This is a local browser application prototype. No application account, API key, AI provider, database, or backend service is required. Access to this private GitHub repository is required to clone it.
 
@@ -49,9 +49,15 @@ The server binds to `127.0.0.1`. No `.env` file or credentials are needed to run
 
 ## Create your first diagram
 
+### Draw directly with Excalidraw
+
+Click **Start drawing** in the navigation to open a new blank canvas immediately. No Mermaid code or valid preview is required. Use Excalidraw's native tools to draw shapes, arrows, text, and freehand lines, then use **Download JPEG**, **Download SVG**, or **Download project**.
+
+Each click creates a separate drawing draft and preserves existing drafts and Mermaid source. Blank drawings use the same autosave, backup, and import features as converted diagrams. Use **Canvas draft** to switch drawings, or **Mermaid code** to return to the code editor. Drawing drafts have an empty source snapshot; canvas edits do not generate Mermaid code. The 100-draft project limit also applies to blank drawings.
+
 ### 1. Write or paste Mermaid
 
-Open **1. Structure** and paste this into **Mermaid code**:
+For the code-based workflow, open **Mermaid code** and paste this into the editor:
 
 ```mermaid
 flowchart TD
@@ -81,11 +87,11 @@ You can also separate steps with `then` or `→`. This feature uses deterministi
 ### 3. Convert and edit
 
 1. Click **Continue to Excalidraw** after the preview is ready.
-2. In **2. Finish & export**, select and move shapes, edit labels, or change colors with the embedded editor controls.
+2. In **Canvas & export**, select and move shapes, edit labels, or change colors with the embedded editor controls.
 3. Use **Fit drawing** to bring the scene into view.
 4. Use **Canvas draft** to switch between saved drafts.
 
-Each conversion creates a new draft. Returning to **1. Structure**, changing the code, and converting again preserves earlier canvas drafts. Canvas edits do not rewrite the Mermaid source, and source edits do not update an existing canvas automatically. Subgraph elements are made individually selectable during conversion.
+Each conversion creates a new draft. Returning to **Mermaid code**, changing the code, and converting again preserves earlier canvas drafts. Canvas edits do not rewrite the Mermaid source, and source edits do not update an existing canvas automatically. Subgraph elements are made individually selectable during conversion.
 
 ### 4. Export or back up
 
@@ -122,7 +128,7 @@ npx vite preview --host 127.0.0.1
 
 Open the URL printed by the preview command. Build first; there is no `npm run preview` script. Production hosting requires serving `dist/` through a static web server. Repository creation does not deploy the application.
 
-The four current unit tests cover source normalization and flowchart detection, malformed project rejection, JSON round-trip preservation, and escaping/validation in local step generation. They do not constitute browser end-to-end coverage.
+The five current unit tests cover source normalization and flowchart detection, malformed project rejection, JSON round-trip preservation, escaping/validation in local step generation, and backups containing both blank drawings and Mermaid drafts. They do not constitute browser end-to-end coverage.
 
 ## How the application works
 

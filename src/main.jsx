@@ -87,6 +87,12 @@ function App() {
     } catch (error) { setMessage(error.message || 'Conversion failed. Check the Mermaid code.'); }
     finally { setBusy(false); }
   }
+  function startDrawing() {
+    if (busy) return;
+    if (drafts.length >= 100) { setMessage('This project has 100 drafts. Download a backup before starting a new project.'); return; }
+    const draft = { id: crypto.randomUUID(), name: `Drawing ${drafts.length + 1}`, source: '', elements: [], files: {}, appState: { viewBackgroundColor: '#ffffff' } };
+    setDrafts(prev => [...prev, draft]); setActive(draft.id); api.current = null; setMessage(''); setStage('canvas');
+  }
   function sceneChanged(elements, appState, files) {
     const saved = { elements, files, appState: { viewBackgroundColor: appState.viewBackgroundColor, scrollX: appState.scrollX, scrollY: appState.scrollY, zoom: appState.zoom } };
     setDrafts(prev => {
@@ -130,10 +136,10 @@ function App() {
   }
   return <div className="studio">
     <header><div className="brand">Flow Studio<span>Mermaid to Excalidraw</span></div><div className="project-actions"><span className="save-status" role="status">{saveStatus}</span><button onClick={() => input.current.click()}>Open project</button><button onClick={() => download(new Blob([JSON.stringify({ version: 1, source, drafts }, null, 2)], { type: 'application/json' }), 'flow-studio.flow.json')}>Download project</button><input ref={input} type="file" accept=".json" hidden onChange={importProject}/></div></header>
-    <nav aria-label="Diagram stages"><button className={stage === 'source' ? 'selected' : ''} onClick={() => setStage('source')}>1. Structure</button><button disabled={!current} className={stage === 'canvas' ? 'selected' : ''} onClick={() => setStage('canvas')}>2. Finish & export</button><span>Start with structure. Finish with your own touch.</span></nav>
+    <nav aria-label="Diagram workspace"><button aria-pressed={stage === 'source'} className={stage === 'source' ? 'selected' : ''} onClick={() => setStage('source')}>Mermaid code</button><button aria-pressed={stage === 'canvas'} disabled={!current} className={stage === 'canvas' ? 'selected' : ''} onClick={() => setStage('canvas')}>Canvas & export</button><button disabled={busy} onClick={startDrawing}>Start drawing</button><span>Use Mermaid or start with a blank canvas.</span></nav>
     {message && <div className="notice" role="status">{message}<button aria-label="Dismiss message" onClick={() => setMessage('')}>Dismiss</button></div>}
     {stage === 'source' ? <main className="source-stage">
-      <div className="stage-heading"><div><h1>Shape your flow</h1><p>Edit Mermaid code and check the structure before moving to the canvas.</p></div><button className="primary" disabled={busy || preview.status !== 'valid' || preview.source !== source} onClick={convert}>{busy ? 'Converting…' : 'Continue to Excalidraw'}</button></div>
+      <div className="stage-heading"><div><h1>Shape your flow</h1><p>Edit Mermaid code below, or choose Start drawing for a blank Excalidraw canvas.</p></div><button className="primary" disabled={busy || preview.status !== 'valid' || preview.source !== source} onClick={convert}>{busy ? 'Converting…' : 'Continue to Excalidraw'}</button></div>
       <div className="workspace"><section className="code-pane"><div className="pane-heading"><h2>Mermaid code</h2><button onClick={() => setShowDescription(!showDescription)} aria-expanded={showDescription}>Start from steps</button></div>
         {showDescription && <div className="describe"><label htmlFor="description">Describe a sequence, one step per line</label><textarea id="description" value={description} onChange={e => setDescription(e.target.value)} placeholder={'Receive request\nReview request\nSend response'}/><p>Local generation creates a linear flow. Add decisions and branches in the code below.</p><button onClick={() => { try { setSource(stepsToMermaid(description)); setMessage('Mermaid generated from your steps. Review and refine the code.'); } catch (e) { setMessage(e.message); } }}>Generate Mermaid</button></div>}
         <label className="sr-only" htmlFor="mermaid-code">Mermaid code</label><textarea id="mermaid-code" className="code" maxLength={50000} spellCheck="false" value={source} onChange={e => setSource(e.target.value)} placeholder="Paste a Mermaid flowchart here…"/><div className="pane-footer">Flowcharts · {source.length.toLocaleString()} characters</div></section>
